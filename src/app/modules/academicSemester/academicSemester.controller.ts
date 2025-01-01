@@ -1,33 +1,39 @@
-import { RequestHandler } from 'express';
+
+import sendResponse from '../../middlewares/sendResponse';
 import createAsync from '../../utils/createAsync';
 import { AcademicSemesterServices } from './academicSemester.service';
+import status from 'http-status-codes';
 
-const createAcademicSemester = createAsync(async (req, res, next) => {
+const createAcademicSemester = createAsync(async (req, res) => {
   const result = await AcademicSemesterServices.createAcademicSemesterIntoDb(
     req.body,
   );
-  res.status(200).json({
-    success: true,
-    message: 'Academic Semester is created successfully',
-    data: result,
-  });
+   sendResponse(res, {
+     statusCode: status.OK,
+     success: true,
+     message: 'create a academic department',
+     data: result,
+   });
 });
-const getAllAcademicSemesters = createAsync(async (req, res, next) => {
-  const result = await AcademicSemesterServices.getAllAcademicSemesterFromDb();
-  res.status(200).json({
-    success: true,
-    message: 'Academic Semesters are get successfully',
-    data: result,
-  });
+const getAllAcademicSemesters = createAsync(async (req, res) => {
+  const result = await AcademicSemesterServices.getAllAcademicSemesterFromDb(req.query);
+   sendResponse(res, {
+     statusCode: status.OK,
+     success: true,
+     message: 'get all academic department',
+     meta: result.meta,
+     data: result.result,
+   });
 });
 
-const getSingleAcademicSemester = createAsync(async (req, res, next) => {
+const getSingleAcademicSemester = createAsync(async (req, res) => {
   const { semesterId } = req.params;
   const result =
     await AcademicSemesterServices.getSingleAcademicSemesterFromDb(semesterId);
-  res.status(200).json({
+  sendResponse(res, {
+    statusCode: status.OK,
     success: true,
-    message: 'get a single academic semester',
+    message: 'get a academic department',
     data: result,
   });
 });
@@ -38,11 +44,12 @@ const updateAcademicSemester = createAsync(async (req, res) => {
     semesterId,
     req.body,
   );
-  res.status(200).json({
-    success: true,
-    message: 'Update a academic semester',
-    data: result,
-  });
+   sendResponse(res, {
+     statusCode: status.OK,
+     success: true,
+     message: 'update a academic department',
+     data: result,
+   });
 });
 export const AcademicSemesterControllers = {
   createAcademicSemester,

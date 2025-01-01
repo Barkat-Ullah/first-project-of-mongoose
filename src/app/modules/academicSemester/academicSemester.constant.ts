@@ -10,6 +10,9 @@ export const Months: TMonths[] = [
   'February',
   'March',
   'April',
+  'May',
+  'June',
+  'July',
   'August',
   'September',
   'October',
@@ -28,3 +31,4 @@ export const academicSemesterNameCodeMapper: TAcademicSemesterNameCodeMapper = {
   Summer: '02',
   Fall: '03',
 };
+export const AcademicSemesterSearchableFields = ['name'];

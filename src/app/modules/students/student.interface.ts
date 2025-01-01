@@ -39,18 +39,12 @@ export type TStudent = {
   profileImg?: string;
   admissionSemester: Types.ObjectId;
   isDeleted: boolean;
+  academicDepartment: Types.ObjectId;
+  academicFaculty: Types.ObjectId;
 };
 
 export interface StudentModel extends Model<TStudent>
  {
+  // eslint-disable-next-line no-unused-vars
   isUserExits(id:string):Promise<TStudent | null>
 }
-
-// export type studentMethods = {
-//   isUserExits(id: string): Promise<TStudent | null>;
-// };
-// export type StudentModel = Model<
-//   TStudent,
-//   Record<string, never>,
-//   studentMethods
-// >;

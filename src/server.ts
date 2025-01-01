@@ -1,27 +1,37 @@
 import mongoose from 'mongoose';
 import app from './app';
 import config from './app/config';
-import findFreePort from 'find-free-port';
+import { Server } from 'http';
+import seedSuperAdmin from './app/DB';
 
+let server: Server;
 async function main() {
   try {
-    // Connect to MongoDB
     await mongoose.connect(config.database_url as string);
     console.log('✅ Database connected successfully');
+    seedSuperAdmin();
 
-    // Get the default port from .env or use 5000
-    const defaultPort = parseInt(config.port as string, 10) || 5000;
-
-    // Find a free port if the default port is in use
-    const [freePort] = await findFreePort(defaultPort);
-
-    app.listen(freePort, () => {
-      console.log(`🚀 Server is running on port ${freePort}`);
+    server = app.listen(config.port, () => {
+      console.log(`👌 app is listening on port ${config.port}`);
     });
   } catch (err) {
     console.error('❌ Error starting the server:', err);
   }
 }
 
-// Start the server
-main().catch((err) => console.error('❌ Unexpected error:', err));
+main();
+
+process.on('unhandledRejection', () => {
+  console.log(`😈 unhandledRejection is detected , shutting down ...`);
+  if (server) {
+    server.close(() => {
+      process.exit(1);
+    });
+  }
+  process.exit(1);
+});
+
+process.on('uncaughtException', () => {
+  console.log(`😈 uncaughtException is detected , shutting down ....`);
+  process.exit(1);
+});

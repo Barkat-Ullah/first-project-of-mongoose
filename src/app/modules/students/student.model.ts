@@ -1,4 +1,4 @@
-import { Schema, Types, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import validator from 'validator';
 import {
   StudentModel,
@@ -7,6 +7,7 @@ import {
   TStudent,
   TUserName,
 } from './student.interface';
+import AppError from '../../error/AppError';
 
 const userNameSchema = new Schema<TUserName>({
   firstName: {
@@ -137,14 +138,23 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
     profileImg: {
       type: String,
+      default:''
     },
-    admissionSemester:{
-      type:Schema.Types.ObjectId,
-      ref:'academicSemester'
+    admissionSemester: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicSemester',
     },
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
+    academicFaculty: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicFaculty',
     },
   },
   {
@@ -154,7 +164,14 @@ const studentSchema = new Schema<TStudent, StudentModel>(
   },
 );
 
-
+studentSchema.pre('findOneAndUpdate', async function (next) {
+  const query = this.getQuery();
+  const isDeletedStudentExists = await Student.findOne(query);
+  if (!isDeletedStudentExists) {
+    throw new AppError(404, 'This student or user does not exists');
+  }
+  next();
+});
 
 studentSchema.pre('find', function (next) {
   this.find({
@@ -175,7 +192,7 @@ studentSchema.pre('findOne', function (next) {
 });
 
 studentSchema.virtual('fullName').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+  return `${this?.name?.firstName} ${this?.name?.middleName} ${this?.name?.lastName}`;
 });
 
 // creating a custom static method
